@@ -25,6 +25,9 @@ public:
     //读取一帧数据，数据由调用者清理
     virtual XData Read() = 0;
 
+    //总时长（毫秒）
+    int totalMs = 0;
+
 protected:
     virtual void Main();
 
