@@ -26,7 +26,6 @@ public:
         sh.GetTexture(1, width / 2, height / 2, data[1]);
         sh.GetTexture(2, width / 2, height / 2, data[2]);
         sh.Draw();
-        XLOGE("一直在绘制  2  %d", width);
         XEGL::Get()->Draw();
     }
 };
