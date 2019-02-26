@@ -3,12 +3,14 @@
 
 #include "FFDemux.h"
 #include "XLog.h"
+#include "IDecode.h"
+#include "FFDecode.h"
 
 
 class TestObs : public IObserver {
 public:
     void Update(XData d) {
-        XLOGI("TestObs Update data size is %d", d.size);
+//        XLOGI("TestObs Update data size is %d", d.size);
     }
 };
 
@@ -26,9 +28,22 @@ Java_play_xplay_MainActivity_stringFromJNI(
     IDemux *de = new FFDemux();
     de->AddObs(tobs);
     de->Open("/storage/emulated/0/Download/meimei.mp4");
+
+    IDecode *vdecode = new FFDecode();
+    vdecode->Open(de->GetVPara());
+
+    IDecode *adecode = new FFDecode();
+    adecode->Open(de->GetAPara());
+
+    de->AddObs(vdecode);
+    de->AddObs(adecode);
+
     de->Start();
-    XSleep(3000);
-    de->Stop();
+    vdecode->Start();
+    adecode->Start();
+
+//    XSleep(3000);
+//    de->Stop();
 
 
 //    for (;;) {
