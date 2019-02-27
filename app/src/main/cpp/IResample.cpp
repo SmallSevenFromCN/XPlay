@@ -8,7 +8,7 @@
 void IResample:: Update(XData data)
 {
     XData d = this->Resample(data);
-    XLOGE("this->Resample(data)  %d",d.size);
+//    XLOGE("this->Resample(data)  %d",d.size);
     if (d.size>0){
         this->Notify(d);
     }

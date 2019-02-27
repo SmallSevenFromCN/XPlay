@@ -25,7 +25,7 @@ public:
 
     virtual void Draw(unsigned char *data[], int width, int height) {
         sh.GetTexture(0, width, height, data[0]);
-        if(type = XTEXTURE_YUV420P){
+        if(type == XTEXTURE_YUV420P){
             sh.GetTexture(1, width / 2, height / 2, data[1]);
             sh.GetTexture(2, width / 2, height / 2, data[2]);
         } else{
