@@ -5,6 +5,11 @@ extern "C" {
 #include <libavformat/avformat.h>
 }
 
+//分数转为浮点数
+static double r2d(AVRational r) {
+    return r.num == 0 || r.den == 0 ? 0. : (double) r.num / (double) r.den;
+}
+
 //打开文件，或者流媒体  rmtp http rtsp
 bool FFDemux::Open(const char *url) {
 
@@ -48,15 +53,22 @@ XData FFDemux::Read() {
 //    XLOGI("pack size is %d pts %lld", pkt->size,pkt->pts);
     d.data = (unsigned char *) pkt;
     d.size = pkt->size;
-    if (pkt->stream_index == audioStream)
-    {
+    if (pkt->stream_index == audioStream) {
         d.isAudio = true;
-    } else if(pkt->stream_index == videoStream){
+    } else if (pkt->stream_index == videoStream) {
         d.isAudio = false;
-    } else{
+    } else {
         av_packet_free(&pkt);
         return XData();
     }
+
+    //转换pts
+    pkt->pts = pkt->pts * (1000 * r2d(ic->streams[pkt->stream_index]->time_base));
+    pkt->dts = pkt->dts * (1000 * r2d(ic->streams[pkt->stream_index]->time_base));
+
+    d.pts = (int)pkt->pts;
+//    XLOGE("demux pts %d",d.pts);
+
     return d;
 }
 
@@ -81,7 +93,7 @@ XParameter FFDemux::GetVPara() {
 }
 
 //获取音频参数
-XParameter FFDemux:: GetAPara(){
+XParameter FFDemux::GetAPara() {
     if (!ic) {
         XLOGE("GetAPara failed!  ic  is NULL!");
         return XParameter();
@@ -96,8 +108,8 @@ XParameter FFDemux:: GetAPara(){
     audioStream = re;
     XParameter para;
     para.para = ic->streams[re]->codecpar;
-    para.channels =ic->streams[re]->codecpar->channels;
-    para.sample_rate =ic->streams[re]->codecpar->sample_rate;
+    para.channels = ic->streams[re]->codecpar->channels;
+    para.sample_rate = ic->streams[re]->codecpar->sample_rate;
     return para;
 }
 

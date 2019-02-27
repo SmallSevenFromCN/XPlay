@@ -11,10 +11,10 @@ void IDecode::Update(XData pkt) {
         return;
     }
 
-    while (!isExit){
+    while (!isExit) {
         packsMutex.lock();
         //阻塞
-        if(packs.size() < maxList){
+        if (packs.size() < maxList) {
             //生产者
             packs.push_back(pkt);
             packsMutex.unlock();
@@ -30,7 +30,18 @@ void IDecode::Main() {
 
     while (!isExit) {
         packsMutex.lock();
-        if (packs.empty()){
+
+        //判断音视频同步
+        if (!isAudio && synPts > 0) {
+            if (synPts < pts) {
+                packsMutex.unlock();
+                XSleep(1);
+                continue;
+            }
+        }
+
+
+        if (packs.empty()) {
             packsMutex.unlock();
             XSleep(1);
             continue;
@@ -40,13 +51,13 @@ void IDecode::Main() {
         packs.pop_front();
 
         //发送数据到解码线程,一个数据包，可能解码多个结果
-        if(this->SendPacket(pack))
-        {
-            while (!isExit){
+        if (this->SendPacket(pack)) {
+            while (!isExit) {
                 //获取解码数据
                 XData frame = RecvFrame();
                 if (!frame.data) break;
 //                XLOGE("RecvFrame %d",frame.size);
+                pts = frame.pts;
 //                发送数据给观察者
                 this->Notify(frame);
             }
