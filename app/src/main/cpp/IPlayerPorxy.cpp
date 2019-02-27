@@ -5,6 +5,13 @@
 #include "IPlayerPorxy.h"
 #include "FFPlayerBuilder.h"
 
+void IPlayerPorxy::Close(){
+    mux.lock();
+    if (player)
+        player->Close();
+    mux.unlock();
+}
+
 void IPlayerPorxy::Init(void *vm) {
     mux.lock();
     if (vm) {

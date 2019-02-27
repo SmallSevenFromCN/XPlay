@@ -12,6 +12,8 @@ extern "C"
 JNIEXPORT
 jint JNI_OnLoad(JavaVM *vm, void *res) {
     IPlayerPorxy::Get()->Init(vm);
+    IPlayerPorxy::Get()->Open("/storage/emulated/0/Download/meimei.mp4");
+    IPlayerPorxy::Get()->Start();
     return JNI_VERSION_1_4;
 }
 
@@ -23,8 +25,7 @@ Java_play_xplay_MainActivity_stringFromJNI(
         jobject /* this */) {
     std::string hello = "Hello from C++";
 
-    IPlayerPorxy::Get()->Open("/storage/emulated/0/Download/meimei.mp4");
-    IPlayerPorxy::Get()->Start();
+
     return env->NewStringUTF(hello.c_str());
 }
 extern "C"

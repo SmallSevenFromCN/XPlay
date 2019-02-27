@@ -18,7 +18,7 @@ IPlayer *IPlayer::Get(unsigned char index) {
 void IPlayer::Main() {
     while (!isExit) {
         mux.lock();
-        if (!audioPlay || !vdecode){
+        if (!audioPlay || !vdecode) {
             mux.unlock();
             XSleep(2);
             continue;
@@ -33,8 +33,42 @@ void IPlayer::Main() {
     }
 }
 
+void IPlayer::Close() {
+    mux.lock();
+    //先关闭主体线程，再清理观察者
+    //同步线程
+    XThread::Stop();
+    //解封装
+    if (demux)
+        demux->Stop();
+    //解码
+    if (vdecode)
+        vdecode->Stop();
+    if (adecode)
+        adecode->Stop();
+    //清理缓冲队列
+    if (vdecode)
+        vdecode->Clear();
+    if (adecode)
+        adecode->Clear();
+    if (audioPlay)
+        audioPlay->Clear();
+    //清理资源
+    if (audioPlay)
+        audioPlay->Close();
+    if (videoView)
+        videoView->Close();
+    if (vdecode)
+        vdecode->Close();
+    if (adecode)
+        adecode->Close();
+    if (demux)
+        demux->Close();
+    mux.unlock();
+}
 
 bool IPlayer::Open(const char *path) {
+    Close();
     mux.lock();
     //解封装
     if (!demux || !demux->Open(path)) {
@@ -65,17 +99,17 @@ bool IPlayer::Open(const char *path) {
 
 bool IPlayer::Start() {
     mux.lock();
+    if (audioPlay)
+        audioPlay->StartPlay(outPara);
+    if (vdecode)
+        vdecode->Start();
+    if (adecode)
+        adecode->Start();
     if (!demux || !demux->Start()) {
         mux.unlock();
         XLOGE("demux->Start failed!");
         return false;
     }
-    if (adecode)
-        adecode->Start();
-    if (audioPlay)
-        audioPlay->StartPlay(outPara);
-    if (vdecode)
-        vdecode->Start();
     XThread::Start();
     mux.unlock();
     return true;
