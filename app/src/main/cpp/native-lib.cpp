@@ -22,6 +22,15 @@ public:
     }
 };
 
+extern "C"
+JNIEXPORT
+jint JNI_OnLoad(JavaVM *vm,void *res){
+    FFDecode::InitHard(vm);
+    return JNI_VERSION_1_4;
+}
+
+
+
 IVideoView *view = NULL;
 
 extern "C" JNIEXPORT jstring
@@ -39,7 +48,7 @@ Java_play_xplay_MainActivity_stringFromJNI(
     de->Open("/storage/emulated/0/Download/meimei.mp4");
 
     IDecode *vdecode = new FFDecode();
-    vdecode->Open(de->GetVPara());
+    vdecode->Open(de->GetVPara(), true);
 
     IDecode *adecode = new FFDecode();
     adecode->Open(de->GetAPara());
@@ -47,12 +56,12 @@ Java_play_xplay_MainActivity_stringFromJNI(
     de->AddObs(vdecode);
     de->AddObs(adecode);
 
-    view =new GLVideoView();
+    view = new GLVideoView();
     vdecode->AddObs(view);
 
     IResample *resample = new FFResample();
     XParameter outPara = de->GetAPara();
-    resample->Open(de->GetAPara(),outPara);
+    resample->Open(de->GetAPara(), outPara);
     adecode->AddObs(resample);
 
     IAudioPlay *audioPlay = new SLAudioPlay();
