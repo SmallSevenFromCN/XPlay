@@ -5,7 +5,7 @@
 #include "IPlayerPorxy.h"
 #include "FFPlayerBuilder.h"
 
-void IPlayerPorxy::Close(){
+void IPlayerPorxy::Close() {
     mux.lock();
     if (player)
         player->Close();
@@ -22,11 +22,52 @@ void IPlayerPorxy::Init(void *vm) {
     mux.unlock();
 }
 
-bool IPlayerPorxy::Open(const char *path) {
+double IPlayerPorxy::PlayPos() {
+    double pos = 0.0;
+    mux.lock();
+    if (player) {
+        pos = player->PlayPos();
+    }
+    mux.unlock();
+    return pos;
+}
+
+
+bool IPlayerPorxy::IsPause() {
     bool re = false;
     mux.lock();
     if (player)
+        re = player->IsPause();
+    mux.unlock();
+    return re;
+}
+
+
+void IPlayerPorxy::SetPause(bool isP) {
+    mux.lock();
+    if (player)
+        player->SetPause(isP);
+    mux.unlock();
+}
+
+
+bool IPlayerPorxy::Seek(double pos) {
+    bool re = false;
+    mux.lock();
+    if (player) {
+        re = player->Seek(pos);
+    }
+    mux.unlock();
+    return re;
+};
+
+bool IPlayerPorxy::Open(const char *path) {
+    bool re = false;
+    mux.lock();
+    if (player) {
+        player->isHardDecode = isHardDecode;
         re = player->Open(path);
+    }
     mux.unlock();
     return re;
 }

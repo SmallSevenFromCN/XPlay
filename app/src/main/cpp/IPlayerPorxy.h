@@ -21,12 +21,19 @@ public:
 
     virtual bool Open(const char *path);
 
+    virtual bool Seek(double pos);
+
     virtual void Close();
 
     virtual bool Start();
 
     virtual void InitView(void *win);
 
+    virtual void SetPause(bool isP);
+
+    virtual bool IsPause();
+
+    virtual double  PlayPos();
 
 protected:
     IPlayerPorxy(){}

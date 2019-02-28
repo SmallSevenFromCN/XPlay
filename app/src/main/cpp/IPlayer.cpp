@@ -46,6 +46,9 @@ void IPlayer::Close() {
         vdecode->Stop();
     if (adecode)
         adecode->Stop();
+    if(audioPlay)
+        audioPlay->Stop();
+
     //清理缓冲队列
     if (vdecode)
         vdecode->Clear();
@@ -67,6 +70,47 @@ void IPlayer::Close() {
     mux.unlock();
 }
 
+double IPlayer::PlayPos() {
+    double pos = 0.0;
+    mux.lock();
+    int total = 0;
+    if (demux)
+        total = demux->totalMs;
+
+    if (total > 0) {
+        if (vdecode) {
+            pos = vdecode->pts / (double) total;
+        }
+    }
+    mux.unlock();
+    return pos;
+}
+
+void IPlayer::SetPause(bool isP){
+    mux.lock();
+    XThread::SetPause(isP);
+    if(demux)
+        demux->SetPause(isP);
+    if(vdecode)
+        vdecode->SetPause(isP);
+    if(adecode)
+        adecode->SetPause(isP);
+    if(audioPlay)
+        audioPlay->SetPause(isP);
+    mux.unlock();
+}
+
+bool IPlayer::Seek(double pos) {
+    bool re = false;
+    mux.lock();
+    //暂停所有线程
+    if (demux)
+        re = demux->Seek(pos);
+    mux.unlock();
+    return re;
+}
+
+
 bool IPlayer::Open(const char *path) {
     Close();
     mux.lock();
@@ -76,6 +120,7 @@ bool IPlayer::Open(const char *path) {
         XLOGE("demux->Open %s failed!", path);
         return false;
     }
+
     //解码  解码可能不需要，如果是解封之后就是原始数据
     if (!vdecode || !vdecode->Open(demux->GetVPara(), isHardDecode)) {
         XLOGE("vdecode->Open %s failed!", path);

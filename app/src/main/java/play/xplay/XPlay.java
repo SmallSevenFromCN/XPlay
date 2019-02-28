@@ -3,13 +3,15 @@ package play.xplay;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-public class XPlay extends GLSurfaceView implements SurfaceHolder.Callback,GLSurfaceView.Renderer {
+public class XPlay extends GLSurfaceView implements SurfaceHolder.Callback,GLSurfaceView.Renderer, View.OnClickListener {
 
 
     public XPlay(Context context) {
@@ -19,6 +21,7 @@ public class XPlay extends GLSurfaceView implements SurfaceHolder.Callback,GLSur
     public XPlay(Context context, AttributeSet attrs) {
         super(context, attrs);
         setRenderer(this);
+        setOnClickListener(this);
     }
 
 
@@ -60,4 +63,11 @@ public class XPlay extends GLSurfaceView implements SurfaceHolder.Callback,GLSur
     public native void InitView(Object surface);
 
 
+    @Override
+    public void onClick(View v) {
+        Log.e("TaoTao", "  onClick  ");
+        PlayOrPause();
+    }
+
+    public native void PlayOrPause();
 }
