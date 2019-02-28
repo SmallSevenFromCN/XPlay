@@ -18,6 +18,7 @@ public class XPlay extends GLSurfaceView implements SurfaceHolder.Callback,GLSur
 
     public XPlay(Context context, AttributeSet attrs) {
         super(context, attrs);
+        setRenderer(this);
     }
 
 
@@ -26,7 +27,7 @@ public class XPlay extends GLSurfaceView implements SurfaceHolder.Callback,GLSur
     public void surfaceCreated(SurfaceHolder holder) {
         InitView(holder.getSurface());
         //android 8.0需要设置
-        setRenderer(this);
+
     }
 
 
@@ -39,9 +40,6 @@ public class XPlay extends GLSurfaceView implements SurfaceHolder.Callback,GLSur
     public void surfaceDestroyed(SurfaceHolder holder) {
 
     }
-
-
-    public native void InitView(Object surface);
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
@@ -57,4 +55,9 @@ public class XPlay extends GLSurfaceView implements SurfaceHolder.Callback,GLSur
     public void onDrawFrame(GL10 gl) {
 
     }
+
+
+    public native void InitView(Object surface);
+
+
 }

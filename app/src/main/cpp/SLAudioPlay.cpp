@@ -49,11 +49,12 @@ void SLAudioPlay::PlayCall(void *bufq) {
         XLOGE("GetData size is 0");
         return;
     }
-    if(!buf)
+    if (!buf)
         return;
-    memcpy(buf,d.data,d.size);
+    memcpy(buf, d.data, d.size);
     mux.lock();
-    (*bf)->Enqueue(bf, buf, d.size);
+    if (pcmQue && (*pcmQue))
+        (*pcmQue)->Enqueue(pcmQue, buf, d.size);
     mux.unlock();
     d.Drop();
 }
@@ -74,33 +75,39 @@ void SLAudioPlay::Close() {
     mux.lock();
 
     //停止播放
-    if(iplayer && (*iplayer)){
-        (*iplayer)->SetPlayState(iplayer,SL_PLAYSTATE_STOPPED);
+    if (iplayer && (*iplayer)) {
+        (*iplayer)->SetPlayState(iplayer, SL_PLAYSTATE_STOPPED);
     }
 
     //清理播放队列
-    if(pcmQue && (*pcmQue)){
+    if (pcmQue && (*pcmQue)) {
         (*pcmQue)->Clear(pcmQue);
     }
 
     //销毁player对象
-    if(player &&(*player)){
+    if (player && (*player)) {
         (*player)->Destroy(player);
     }
 
     //销毁混音器
-    if (mix && (*mix)){
+    if (mix && (*mix)) {
         (*mix)->Destroy(mix);
     }
 
     //销毁播放引擎
-    if(engineSL && (*engineSL)){
+    if (engineSL && (*engineSL)) {
         (*engineSL)->Destroy(engineSL);
     }
 
+    engineSL = NULL;
+    eng = NULL;
+    mix = NULL;
+    player = NULL;
+    iplayer = NULL;
+    pcmQue = NULL;
+
     mux.unlock();
 }
-
 
 
 bool SLAudioPlay::StartPlay(XParameter out) {
