@@ -34,7 +34,7 @@
 
         <EditText
             android:id="@+id/et_tv_url"
-            android:text="rtmp://58.200.131.2:1935/livetv/hunantv"
+            android:text="rtmp://get.16made.com/pmlss/pmssl/test"
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="wrap_content" />
